@@ -1,5 +1,5 @@
-import {books,typeLabels} from './data.mjs?v=216bcf6f76f8';
-import {snapshot,connections,validBook} from './model.mjs?v=216bcf6f76f8';
+import {books,typeLabels} from './data.mjs?v=f1e1d6bf9689';
+import {snapshot,connections,validBook} from './model.mjs?v=f1e1d6bf9689';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -11,16 +11,21 @@ function familyOf(id){return state.families.find(f=>f.parents.includes(id)||f.ch
 function name(id){const p=person(id),f=familyOf(id);return p.label+(f?' '+f.name:'');}
 
 function buildLayout(){
-  const width=Math.max(1500,state.families.length*210+70),positions=new Map();
+  const positions=new Map();
   state.families.forEach((f,i)=>{
     const cx=140+i*210;
     f.parents.forEach((id,j)=>positions.set(id,{x:cx+(f.parents.length===2?(j?51:-51):0),y:145,w:f.parents.length===2?94:145,h:38,parent:true,column:i}));
     f.children.forEach((id,j)=>positions.set(id,{x:cx+10,y:280+j*61,w:148,h:42,column:i}));
   });
   const outside=state.people.filter(p=>!positions.has(p.id));
-  outside.forEach((p,i)=>positions.set(p.id,{x:140+(i%Math.floor((width-70)/190))*190,y:730+Math.floor(i/Math.floor((width-70)/190))*62,w:168,h:42,outside:true}));
   const list=connections(state,selected);
-  return {width,height:Math.max(1030,920+list.length*70),positions,outside,list};
+  const connected=new Set([selected,...list.flatMap(r=>[r.a,r.b])]);
+  const visibleOutside=outside.filter(p=>connected.has(p.id));
+  const outsideX=140+state.families.length*210;
+  visibleOutside.forEach((p,i)=>positions.set(p.id,{x:outsideX,y:280+i*61,w:168,h:42,outside:true}));
+  const width=Math.max(1500,(state.families.length+(visibleOutside.length?1:0))*210+70);
+  const connectionTop=Math.max(...[...positions.values()].map(p=>p.y))+110;
+  return {width,height:connectionTop+Math.max(1,list.length)*70+50,positions,outside,visibleOutside,outsideX,connectionTop,list};
 }
 function nodeGraphic(p,pos,related){
   const g=el('g',{class:'person-node'+(pos.parent?' parent':'')+(p.id===selected?' selected':related.has(p.id)?' related':''),role:'button',tabindex:'0','aria-label':name(p.id)+(p.subtitle?', '+p.subtitle:'')+'; show connections','aria-pressed':String(p.id===selected),'data-person':p.id,transform:`translate(${pos.x},${pos.y})`});
@@ -47,11 +52,15 @@ function drawMap(){
     f.children.forEach(id=>{const p=layout.positions.get(id);lines.append(el('path',{d:`M${cx-83} ${p.y} H${p.x-p.w/2}`,class:'family-line'}));});
   });
   svg.append(el('text',{x:56,y:235,class:'generation-label'},'THE CHILDHOOD GENERATION'));
-  if(layout.outside.length)svg.append(el('text',{x:56,y:674,class:'other-heading'},'OTHER PEOPLE · INTRODUCED BY THIS BOOK'));
+  if(layout.visibleOutside.length){
+    svg.append(el('text',{x:layout.outsideX,y:48,'text-anchor':'middle',class:'family-heading'},'Other characters'));
+    svg.append(el('text',{x:layout.outsideX,y:71,'text-anchor':'middle',class:'family-trade'},'Connected to '+person(selected).label));
+    svg.append(el('line',{x1:layout.outsideX-91,x2:layout.outsideX+91,y1:90,y2:90,class:'family-rule'}));
+  }
   const nodes=el('g');const related=new Set(layout.list.flatMap(r=>[r.a,r.b]));
   const edges=el('g',{'aria-hidden':'true'});
   layout.list.forEach((r,i)=>{
-    const a=layout.positions.get(r.a),b=layout.positions.get(r.b),y=870+i*70;
+    const a=layout.positions.get(r.a),b=layout.positions.get(r.b),y=layout.connectionTop+i*70;
     const ax=a.x+a.w/2,bx=b.x+b.w/2,ag=ax+13,bg=bx+13;
     const min=Math.min(ag,bg),max=Math.max(ag,bg),center=(min+max)/2;
     let d=`M${ax} ${a.y} H${ag} V${y-8} Q${ag} ${y} ${ag+8} ${y} H${bg-8} Q${bg} ${y} ${bg} ${y-8} V${b.y} H${bx}`;
@@ -65,9 +74,22 @@ function drawMap(){
     edges.append(el('text',{x:center,y:y+32,class:'child-label'},sub));
   });
   svg.append(edges);
-  state.people.forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
+  state.people.filter(p=>layout.positions.has(p.id)).forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
   $('#map-caption').textContent=`Book ${book} · ${name(selected)}’s connections`;
   resizeMap();
+}
+function drawOtherCharacters(){
+  const list=$('#other-character-list');list.replaceChildren();
+  $('#other-characters').hidden=!layout.outside.length;
+  $('#other-characters-book').textContent='Introduced by Book '+book;
+  const related=new Set(layout.list.flatMap(r=>[r.a,r.b]));
+  layout.outside.forEach(p=>{
+    const b=html('button','other-character'+(related.has(p.id)?' connected':''));
+    b.type='button';b.dataset.person=p.id;b.setAttribute('aria-pressed',String(selected===p.id));
+    b.append(html('span','other-character-name',p.label));
+    if(p.subtitle)b.append(html('span','other-character-subtitle',p.subtitle));
+    list.append(b);
+  });
 }
 function drawPanel(){
   const p=person(selected),f=familyOf(selected),list=connections(state,selected),panel=$('#person-panel');panel.replaceChildren();
@@ -89,10 +111,10 @@ function drawPanel(){
   });
 }
 function resizeMap(){if(!layout)return;$('#family-map').style.transform=`scale(${zoom})`;$('#map-size').style.width=layout.width*zoom+'px';$('#map-size').style.height=layout.height*zoom+'px';$('#zoom-label').textContent=Math.round(zoom*100)+'%';}
-function render(){drawMap();drawPanel();}
+function render(){drawMap();drawOtherCharacters();drawPanel();}
 function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected='elena';document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Showing only information revealed through the end of Book ${book}.`;render();}
 function selectPerson(id){if(!person(id))return;selected=id;render();}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-book]');if(b)setBook(b.dataset.book);const p=e.target.closest('[data-person]');if(p)selectPerson(p.dataset.person);});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-book]');if(b)setBook(b.dataset.book);const p=e.target.closest('[data-person]');if(p){const fromDirectory=Boolean(p.closest('#other-characters'));selectPerson(p.dataset.person);if(fromDirectory){const pos=layout.positions.get(selected);$('#map-scroll').scrollTo({left:Math.max(0,pos.x*zoom-$('#map-scroll').clientWidth/2),top:Math.max(0,pos.y*zoom-130)});$('#other-character-list').querySelector(`[data-person="${selected}"]`)?.focus({preventScroll:true});}}});
 $('#family-map').addEventListener('keydown',e=>{const p=e.target.closest('[data-person]');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectPerson(p.dataset.person);const restored=$('#family-map').querySelector(`[data-person="${selected}"]`);restored?.focus({preventScroll:true});}});
 $('#zoom-out').addEventListener('click',()=>{zoom=Math.max(.3,zoom-.15);resizeMap();});
 $('#zoom-in').addEventListener('click',()=>{zoom=Math.min(1.6,zoom+.15);resizeMap();});

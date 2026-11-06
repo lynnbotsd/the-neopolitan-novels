@@ -16,3 +16,5 @@
 
 - Dating and affairs are distinct categories. Never use a combined “Dating / affair” label. Elena–Gino and the early Elena–Antonio relationship are dating. Category changes belong to book-specific versions.
 - Gino’s map node includes the subtitle “The pharmacist’s son”.
+
+- Keep the Other characters directory outside the map canvas, above it. Only selected/connected characters without a family column appear in the map, in a dedicated rightmost column; never put an unrelated row through connection routes.
