@@ -1,6 +1,6 @@
-import {routeConnections,routePath} from './routing.mjs?v=d9958661eef3';
-import {books,typeLabels} from './data.mjs?v=d9958661eef3';
-import {snapshot,connections,validBook} from './model.mjs?v=d9958661eef3';
+import {routeConnections,routePath} from './routing.mjs?v=6975619567b7';
+import {books,typeLabels} from './data.mjs?v=6975619567b7';
+import {snapshot,connections,validBook} from './model.mjs?v=6975619567b7';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
