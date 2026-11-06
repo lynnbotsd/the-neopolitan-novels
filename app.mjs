@@ -1,10 +1,10 @@
-import {routeConnections,routePath} from './routing.mjs?v=1649c49a4439';
-import {books,typeLabels} from './data.mjs?v=1649c49a4439';
-import {snapshot,connections,validBook} from './model.mjs?v=1649c49a4439';
+import {routeConnections,routePath} from './routing.mjs?v=56ba1d7ae1b4';
+import {books,typeLabels} from './data.mjs?v=56ba1d7ae1b4';
+import {snapshot,connections,validBook} from './model.mjs?v=56ba1d7ae1b4';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
-let book=1,selected='elena',zoom=.75,state=snapshot(1),layout;
+let book=1,selected=null,zoom=.75,state=snapshot(1),layout;
 function el(tag,attrs={},text){const node=document.createElementNS(ns,tag);for(const [k,v]of Object.entries(attrs))node.setAttribute(k,v);if(text!==undefined)node.textContent=text;return node;}
 function html(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;}
 function person(id){return state.people.find(p=>p.id===id);}
@@ -38,7 +38,7 @@ function nodeGraphic(p,pos,related){
 function drawMap(){
   layout=buildLayout();const svg=$('#family-map');svg.replaceChildren();svg.setAttribute('width',layout.width);svg.setAttribute('height',layout.height);svg.setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
   svg.append(el('title',{id:'map-title'},`Family relationships through Book ${book}`));
-  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. Lines descend beside the cards to ${name(selected)}’s chronological connection stack below all names. Select a name for details.`));
+  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. ${selected?'Lines descend beside the cards to '+name(selected)+'’s chronological connection stack below all names.':'No character is selected.'} Select a name for details.`));
   const lines=el('g',{'aria-hidden':'true'});svg.append(lines);
   state.families.forEach((f,i)=>{
     const cx=140+i*210;svg.append(el('text',{x:cx,y:48,'text-anchor':'middle',class:'family-heading'},f.name));
@@ -75,7 +75,7 @@ function drawMap(){
   });
   svg.append(edges,labels);
   state.people.filter(p=>layout.positions.has(p.id)).forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
-  $('#map-caption').textContent=`Book ${book} · Earliest connection at top · Relationship type below each pair`;
+  $('#map-caption').textContent=selected?`Book ${book} · Earliest connection at top · Relationship type below each pair`:`Book ${book} · Select a character to see connections`;
   resizeMap();
 }
 function drawLegend(){
@@ -104,6 +104,11 @@ function drawOtherCharacters(){
 function drawPanel(){
   const p=person(selected),f=familyOf(selected),list=connections(state,selected),panel=$('#person-panel');panel.replaceChildren();
   panel.append(html('p','panel-eyebrow',`Through Book ${book}`));
+  if(!p){
+    panel.append(html('h2','selection-prompt','Select a character'));
+    panel.append(html('p','empty-connections','Choose a name on the map or in Other characters to see their connections.'));
+    return;
+  }
   panel.append(html('h2','person-name',name(selected)));
   panel.append(html('p','person-role',p.role));
   panel.append(html('span','family-pill',f?f.trade:'Beyond the neighborhood'));
@@ -124,7 +129,7 @@ function drawPanel(){
 }
 function resizeMap(){if(!layout)return;$('#family-map').style.transform=`scale(${zoom})`;$('#map-size').style.width=layout.width*zoom+'px';$('#map-size').style.height=layout.height*zoom+'px';$('#zoom-label').textContent=Math.round(zoom*100)+'%';}
 function render(){drawMap();drawLegend();drawOtherCharacters();drawPanel();}
-function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected='elena';document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Characters in Book ${book}; information revealed through its ending.`;render();}
+function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected=null;document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Characters in Book ${book}; information revealed through its ending.`;render();}
 function selectPerson(id){if(!person(id))return;selected=id;render();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-book]');if(b)setBook(b.dataset.book);const p=e.target.closest('[data-person]');if(p){const fromDirectory=Boolean(p.closest('#other-characters'));selectPerson(p.dataset.person);if(fromDirectory){const pos=layout.positions.get(selected);$('#map-scroll').scrollTo({left:Math.max(0,pos.x*zoom-$('#map-scroll').clientWidth/2),top:Math.max(0,pos.y*zoom-130)});$('#other-character-list').querySelector(`[data-person="${selected}"]`)?.focus({preventScroll:true});}}});
 $('#family-map').addEventListener('keydown',e=>{const p=e.target.closest('[data-person]');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectPerson(p.dataset.person);const restored=$('#family-map').querySelector(`[data-person="${selected}"]`);restored?.focus({preventScroll:true});}});

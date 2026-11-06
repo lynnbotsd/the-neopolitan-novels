@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections} from '../model.mjs?v=1649c49a4439';
-import {typeLabels} from '../data.mjs?v=1649c49a4439';
-import {routeConnections,segmentHitsBox} from '../routing.mjs?v=1649c49a4439';
+import {snapshot,connections} from '../model.mjs?v=56ba1d7ae1b4';
+import {typeLabels} from '../data.mjs?v=56ba1d7ae1b4';
+import {routeConnections,segmentHitsBox} from '../routing.mjs?v=56ba1d7ae1b4';
 function fixture(state,selected){
   const positions=new Map();
   state.families.forEach((f,i)=>{

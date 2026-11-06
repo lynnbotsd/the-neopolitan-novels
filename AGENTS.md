@@ -3,7 +3,7 @@
 - User-facing title: **The Neopolitan Novels**. Preserve this requested spelling.
 - Publish to GitHub Pages from the root of `main` in `lynnbotsd/the-neopolitan-novels`.
 - This is an ongoing collaboration with the user. Keep the interface and data easy to revise independently.
-- A fresh page starts at Book 1. Book selection means **finished through the end of that book**.
+- A fresh page starts at Book 1 with no character selected, no romantic/sexual connection lines, and a neutral selection prompt. If a selected character becomes unavailable after a book change, clear selection rather than automatically selecting Elena. Book selection means **finished through the end of that book**.
 - All rendered characters, relationship text, notes, histories, children, labels, and accessible descriptions must use `snapshot(book)` from `model.mjs`. Do not render raw future versions into hidden DOM or tooltips.
 - Reveal information by when the reader learns it, not merely when an event occurred. Be particularly careful with Gennaro’s paternity and Nino’s relationships.
 - Cross-family connections show romantic/sexual relationships and pursuits, not platonic friendships. Do not add an Elena–Lila relationship edge.

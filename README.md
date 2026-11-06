@@ -24,7 +24,7 @@ Open http://localhost:8080. GitHub Pages publishes the root of `main`.
 - `styles.css`: the standalone interface.
 - `tests/spoilers.test.mjs`: book cutoffs and key spoiler regressions.
 
-The page always starts at Book 1. Selecting a book means the reader has finished that entire book. A book-level toggle cannot protect someone midway through that book. The site filters displayed information; the public repository contains the entire series' data.
+The page always starts at Book 1 with no character selected. The family tree is visible, but romantic/sexual connection lines and person details appear only after a visitor chooses a character. Selecting a book means the reader has finished that entire book. A book-level toggle cannot protect someone midway through that book. The site filters displayed information; the public repository contains the entire series' data.
 
 Relationship data is a working editorial draft. Do not treat the previous chat as an authoritative source. Verify uncertain chronology against the novels before adding details; keep future information out of static character roles. The data distinguishes Donato’s assault from courtship and stages Gennaro’s paternity by the reader’s knowledge.
 

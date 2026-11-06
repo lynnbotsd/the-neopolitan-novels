@@ -24,3 +24,5 @@
 .chronology-note{font-size:11px;line-height:1.6;color:var(--muted);margin:10px 0 2px}.relationship-period{font-size:10px;line-height:1.5;color:var(--muted);margin:7px 0 5px}
 
 .connection-label-bg{stroke:var(--border);rx:4}.relationship-label{font-size:10px}
+
+.selection-prompt{font-family:'Libre Caslon Display',Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;margin:0 0 14px}
