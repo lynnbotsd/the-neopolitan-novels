@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections} from '../model.mjs?v=ba4471fc9e8c';
-import {typeLabels} from '../data.mjs?v=ba4471fc9e8c';
-import {routeConnections,segmentHitsBox} from '../routing.mjs?v=ba4471fc9e8c';
+import {snapshot,connections} from '../model.mjs?v=a3d4960a1417';
+import {typeLabels} from '../data.mjs?v=a3d4960a1417';
+import {routeConnections,segmentHitsBox} from '../routing.mjs?v=a3d4960a1417';
 function fixture(state,selected){
   const positions=new Map();
   state.families.forEach((f,i)=>{
@@ -20,6 +20,8 @@ test('every character in every book has routes clear of cards and other labels',
     for(const person of state.people){
       const input=fixture(state,person.id),before=JSON.stringify([...input.positions]),result=routeConnections(input);
       assert.equal(result.routes.length,input.relationships.length,`${book}/${person.id}`);
+      assert.deepEqual(result.routes.map(r=>r.id),input.relationships.map(r=>r.id),'Map and sidebar chronology differ');
+      assert.ok(result.routes.every((r,i,a)=>!i||r.label.y>=a[i-1].label.y+24),'Chronological lanes are not top to bottom');
       assert.equal(JSON.stringify([...input.positions]),before,'Routing moved a character');
       for(const route of result.routes){
         const {points,relationship:r,label}=route;
@@ -45,4 +47,13 @@ test('Elena uses separate ports and nearby gaps instead of bottom loops',()=>{
   const bottom=Math.max(...[...input.positions.values()].map(p=>p.y+p.h/2));
   assert.ok(antonio.label.y<bottom);
   assert.deepEqual(routeConnections(input),result,'Routes must be deterministic');
+});
+
+test('Lila Book 1 starts with Enzo, then adolescent courtships, then Stefano',()=>{
+  const state=snapshot(1),input=fixture(state,'lila');
+  const expected=['lila-enzo','lila-pasquale','lila-marcello','lila-stefano'];
+  assert.deepEqual(input.relationships.map(r=>r.id),expected);
+  assert.deepEqual(routeConnections({...input,relationships:[...input.relationships].reverse()}).routes.map(r=>r.id),['lila-enzo','lila-marcello','lila-pasquale','lila-stefano']);
+  assert.equal(input.relationships[1].chronology.rank,input.relationships[2].chronology.rank,'Overlapping courtships should not claim an exact sequence');
+  assert.deepEqual(connections(snapshot(4),'lila').slice(0,4).map(r=>r.id),expected,'Later partnership status moved the childhood crush');
 });

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=ba4471fc9e8c';
-import {people,relationships} from '../data.mjs?v=ba4471fc9e8c';
+import {snapshot,connections,validBook} from '../model.mjs?v=a3d4960a1417';
+import {people,relationships} from '../data.mjs?v=a3d4960a1417';
 
 test('dating is distinct from affairs and changes with the book',()=>{
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
@@ -90,4 +90,16 @@ test('Elena and Donato are marked past only after Book 2',()=>{
     assert.equal(r.past,true);assert.equal(r.type,'abuse');
     assert.equal(r.label,'Past assault and sexual encounter');
   }
+});
+
+test('chronology follows first involvement without revealing future connections',()=>{
+  assert.deepEqual(connections(snapshot(1),'elena').map(r=>r.id),['elena-nino','elena-gino','elena-donato','elena-antonio']);
+  for(let book=1;book<=4;book++)for(const r of snapshot(book).relationships){
+    assert.ok(Number.isFinite(r.chronology.rank),r.id);
+    assert.equal(r.chronology.period,r.history[0].chronology.period);
+    assert.ok(r.history[0].book<=book);
+  }
+  const last=connections(snapshot(4),'nino').filter(r=>['nino-doctor','nino-silvana','nino-mirella'].includes(r.id));
+  assert.equal(new Set(last.map(r=>r.chronology.rank)).size,1);
+  assert.ok(last.every(r=>r.chronology.period.includes('uncertain')));
 });

@@ -1,6 +1,6 @@
-import {routeConnections,routePath} from './routing.mjs?v=ba4471fc9e8c';
-import {books,typeLabels} from './data.mjs?v=ba4471fc9e8c';
-import {snapshot,connections,validBook} from './model.mjs?v=ba4471fc9e8c';
+import {routeConnections,routePath} from './routing.mjs?v=a3d4960a1417';
+import {books,typeLabels} from './data.mjs?v=a3d4960a1417';
+import {snapshot,connections,validBook} from './model.mjs?v=a3d4960a1417';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -69,13 +69,13 @@ function drawMap(){
     edges.append(group);
     const {x,y,w,h}=route.label;
     labels.append(el('rect',{x:x-w/2,y:y-h/2,width:w,height:h,class:'connection-label-bg'}));
-    const label=el('text',{x,y:y+3.5,class:'connection-label'},route.text);
+    const label=el('text',{x,y:y+3.5,class:'connection-label','data-relationship':r.id},route.text);
     label.append(el('title',{},person(r.a).label+' + '+person(r.b).label+' · '+r.label+(r.children.length?' · Children: '+r.children.join(', '):'')));
     labels.append(label);
   });
   svg.append(edges,labels);
   state.people.filter(p=>layout.positions.has(p.id)).forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
-  $('#map-caption').textContent=`Book ${book} · Connections from ${name(selected)} · Labels name the other person`;
+  $('#map-caption').textContent=`Book ${book} · Earliest connection at top · Labels name the other person`;
   resizeMap();
 }
 function drawLegend(){
@@ -109,10 +109,12 @@ function drawPanel(){
   panel.append(html('span','family-pill',f?f.trade:'Beyond the neighborhood'));
   const heading=html('h3','panel-heading','Known connections');heading.append(html('span','',String(list.length)));panel.append(heading);
   if(!list.length)panel.append(html('p','empty-connections','No romantic or sexual connection is mapped for this person at this point. Their family branch is shown above.'));
+  panel.append(html('p','chronology-note','Earliest first, by first attraction or involvement. Later changes stay with the same connection; some periods overlap.'));
   list.forEach(r=>{
-    const other=r.a===selected?r.b:r.a;const item=html('section','relationship-item');
+    const other=r.a===selected?r.b:r.a;const item=html('section','relationship-item');item.dataset.relationship=r.id;
     const b=html('button','partner-button',name(other));b.type='button';b.dataset.person=other;b.append(html('span','','↗'));item.append(b);
     if(person(other).subtitle)item.append(html('p','partner-subtitle',person(other).subtitle));
+    if(r.chronology)item.append(html('p','relationship-period',r.chronology.period));
     item.append(html('p','relationship-type',(r.past?'Past '+typeLabels[r.type].toLowerCase():typeLabels[r.type])));item.append(html('p','relationship-status',r.label));
     if(r.children.length){const c=html('p','children');c.append(html('strong','','Children · '));c.append(document.createTextNode(r.children.join(', ')));item.append(c);}
     if(r.note)item.append(html('p','relationship-note',r.note));

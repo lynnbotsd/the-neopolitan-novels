@@ -15,10 +15,7 @@ function crosses(a,b,c,d){
 export function routeConnections({positions,relationships,selected,labelFor}){
   const cards=[...positions.values()];
   const bottom=Math.max(...cards.map(p=>p.y+p.h/2));
-  const edges=[...relationships].sort((a,b)=>{
-    const span=r=>Math.abs(positions.get(r.a).x-positions.get(r.b).x);
-    return span(a)-span(b)||a.id.localeCompare(b.id);
-  });
+  const edges=[...relationships].sort((a,b)=>(a.chronology?.rank??Infinity)-(b.chronology?.rank??Infinity));
   const ports=new Map();
   for(const [id,p]of positions){
     const attached=edges.filter(r=>r.a===id||r.b===id).sort((a,b)=>{
@@ -43,17 +40,28 @@ export function routeConnections({positions,relationships,selected,labelFor}){
     const other=r.a===selected?r.b:r.a;
     const labels=labelFor(r,other),span=Math.abs(a.rail-b.rail);
     const full=labels.name+' · '+labels.category;
-    const text=full.length*6.5+20<span-24?full:labels.name;
-    const labelWidth=Math.max(56,text.length*6.5+20);
+    // Keep labels between rail columns, including rails of connections routed later.
+    // This prevents an early label from blocking a later chronological lane.
+    const railXs=[...new Set([...ports.values()].map(p=>p.rail))].sort((x,y)=>x-y);
+    const low=Math.min(a.rail,b.rail),high=Math.max(a.rail,b.rail);
+    const intervals=railXs.slice(1).map((x,i)=>[Math.max(low+8,railXs[i]+6),Math.min(high-8,x-6)]).filter(([l,h])=>h>l);
+    let text,labelWidth,labelX;
+    for(const candidate of [full,labels.name]){
+      const w=Math.max(56,candidate.length*6.5+20);
+      const slots=intervals.filter(([l,h])=>h-l>=w).map(([l,h])=>Math.max(l+w/2,Math.min((low+high)/2,h-w/2)));
+      if(slots.length){text=candidate;labelWidth=w;labelX=slots.sort((x,y)=>Math.abs(x-(low+high)/2)-Math.abs(y-(low+high)/2))[0];break;}
+    }
+    if(!text)throw Error('No label space for '+r.id);
     let best;
     for(const y of gapYs){
+      if(routes.length&&y<routes.at(-1).label.y+24)continue;
       const points=[{x:a.x,y:a.y},{x:a.rail,y:a.y},{x:a.rail,y},{x:b.rail,y},{x:b.rail,y:b.y},{x:b.x,y:b.y}];
       const parts=segments(points);
       if(parts.some(([s,t],i)=>obstacles.some(box=>{
         if((i===0&&box===positions.get(r.a))||(i===parts.length-1&&box===positions.get(r.b)))return false;
         return segmentHitsBox(s,t,box,1);
       })))continue;
-      const label={x:(a.rail+b.rail)/2,y,w:labelWidth,h:16};
+      const label={x:labelX,y,w:labelWidth,h:16};
       if(obstacles.some(box=>overlap(label,box,1)))continue;
       if(routes.some(route=>overlap(label,route.label,5)||parts.some(([s,t])=>segmentHitsBox(s,t,route.label,3))||segments(route.points).some(([s,t])=>segmentHitsBox(s,t,label,3))))continue;
       // Never share a horizontal track over the same span.

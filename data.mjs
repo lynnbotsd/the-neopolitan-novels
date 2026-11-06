@@ -35,7 +35,7 @@ export const people = [
 // A version is cumulative knowledge through the end of that book.
 // Children and uncertain paternity belong inside versions so later revelations cannot leak backward.
 const v = (book,label,children=[],note='',type) => ({book,label,children,note,...(type?{type}:{})});
-export const relationships = [
+const relationshipData = [
   {id:'elena-antonio',a:'elena',b:'antonio',type:'dating',versions:[v(1,'Dating'),v(2,'Their youthful relationship ends'),v(4,'Former partners; a later sexual encounter',[],'Antonio is married when they sleep together again.','encounter')]},
   {id:'elena-donato',a:'elena',b:'donato',type:'abuse',versions:[v(1,'Sexual assault on Ischia',[],'Donato assaults Elena when she is fifteen. This is not a dating relationship.'),v(2,'Earlier assault; later sexual encounter',[],'At seventeen Elena has intercourse with Donato on the beach. Their history is exploitative; he is an adult who already assaulted her.'),{...v(3,'Past assault and sexual encounter',[],'The assault and later encounter occurred in Books 1–2; no ongoing sexual relationship is depicted in this book.'),past:true}]},
   {id:'elena-gino',a:'elena',b:'gino',type:'dating',versions:[v(1,'Dating; relationship ends during this book'),{...v(2,'Former boyfriend'),past:true}]},
@@ -69,4 +69,45 @@ export const relationships = [
   {id:'nino-doctor',a:'nino',b:'gynecologist',type:'affair',versions:[v(4,'Affair reported by Antonio')]},
   {id:'pinuccia-bruno',a:'pinuccia',b:'bruno',type:'pursuit',versions:[v(2,'Pinuccia’s attraction on Ischia',[],'Not shown as a consummated affair.')]}
 ];
+// Ordering describes the first attraction/involvement, not the latest relationship status.
+// Attach it to the first revealed version so unrevealed relationships remain excluded.
+// Equal ranks deliberately represent overlapping events or an uncertain relative order.
+const relationshipBeginnings = {
+  'elena-nino':[10,'Childhood crush'],
+  'lila-enzo':[20,'Childhood crush'],
+  'donato-melina':[30,'Childhood years'],
+  'elena-gino':[100,'Early adolescence'],
+  'lila-pasquale':[110,'Adolescence · overlapping courtships'],
+  'lila-marcello':[110,'Adolescence · overlapping courtships'],
+  'ada-pasquale':[115,'Adolescence'],
+  'enzo-carmen':[115,'Adolescence'],
+  'michele-gigliola':[115,'Adolescence'],
+  'elena-donato':[120,'First Ischia summer'],
+  'lila-stefano':[130,'Later adolescence · courtship and marriage'],
+  'elena-antonio':[140,'After the first Ischia summer'],
+  'alfonso-marisa':[150,'Late adolescence'],
+  'rino-pinuccia':[180,'Book 2 · marriage'],
+  'lila-michele':[185,'Book 2 · shoe-shop years'],
+  'nino-nadia':[190,'Before the Ischia affair'],
+  'lila-nino':[200,'Book 2 · Ischia'],
+  'pinuccia-bruno':[200,'Book 2 · Ischia'],
+  'stefano-ada':[210,'Book 2'],
+  'carmen-roberto':[225,'Book 2 · engagement'],
+  'elena-franco':[230,'Early university years'],
+  'elena-pietro':[240,'Later university years'],
+  'nino-silvia':[250,'Book 3 · earlier relationship'],
+  'nino-eleonora':[260,'Book 3 · married by this point'],
+  'pasquale-nadia':[270,'Book 3 · political activism'],
+  'elisa-marcello':[280,'Book 3 · engagement'],
+  'antonio-wife':[290,'Marriage in Germany'],
+  'alfonso-michele':[320,'Book 4 · exact start uncertain'],
+  'stefano-marisa':[330,'Book 4 · exact start uncertain'],
+  'nino-silvana':[340,'Book 4 · overlapping; exact start uncertain'],
+  'nino-mirella':[340,'Book 4 · overlapping; exact start uncertain'],
+  'nino-doctor':[340,'Book 4 · overlapping; exact start uncertain']
+};
+export const relationships = relationshipData.map(r=>{
+  const [rank,period]=relationshipBeginnings[r.id];
+  return {...r,versions:r.versions.map((version,i)=>i===0?{...version,chronology:{rank,period}}:version)};
+});
 export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',dating:'Dating',affair:'Affair',attraction:'Crush / attraction',relationship:'Sexual relationship',abuse:'Sexual abuse / assault',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};
