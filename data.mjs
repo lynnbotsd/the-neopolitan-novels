@@ -35,7 +35,6 @@ export const people = [
 // Children and uncertain paternity belong inside versions so later revelations cannot leak backward.
 const v = (book,label,children=[],note='') => ({book,label,children,note});
 export const relationships = [
-  {id:'elena-lila',a:'elena',b:'lila',type:'friendship',versions:[v(1,'Childhood friendship'),v(2,'Friendship, rivalry, and distance'),v(3,'Enduring, difficult friendship'),v(4,'Friendship; final estrangement and disappearance')]},
   {id:'elena-antonio',a:'elena',b:'antonio',type:'romance',versions:[v(1,'Dating'),v(2,'Their youthful relationship ends'),v(4,'Former partners; a later sexual encounter',[],'Antonio is married when they sleep together again.')]},
   {id:'elena-donato',a:'elena',b:'donato',type:'abuse',versions:[v(1,'Sexual assault on Ischia',[],'Donato assaults Elena when she is fifteen. This is not a dating relationship.'),v(2,'Earlier assault; later sexual encounter',[],'At seventeen Elena has intercourse with Donato on the beach. Their history is exploitative; he is an adult who already assaulted her.')]},
   {id:'elena-gino',a:'elena',b:'gino',type:'romance',versions:[v(1,'Brief adolescent relationship')]},
@@ -68,4 +67,4 @@ export const relationships = [
   {id:'nino-doctor',a:'nino',b:'gynecologist',type:'romance',versions:[v(4,'Affair reported by Antonio')]},
   {id:'pinuccia-bruno',a:'pinuccia',b:'bruno',type:'pursuit',versions:[v(2,'Pinuccia’s attraction on Ischia',[],'Not shown as a consummated affair.')]}
 ];
-export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',romance:'Dating / affair',abuse:'Sexual abuse / encounter',encounter:'Sexual encounter',friendship:'Friendship',pursuit:'Pursuit / attraction'};
+export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',romance:'Dating / affair',abuse:'Sexual abuse / encounter',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};

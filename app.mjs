@@ -74,7 +74,7 @@ function drawPanel(){
   panel.append(html('p','person-role',p.role));
   panel.append(html('span','family-pill',f?f.trade:'Beyond the neighborhood'));
   const heading=html('h3','panel-heading','Known connections');heading.append(html('span','',String(list.length)));panel.append(heading);
-  if(!list.length)panel.append(html('p','empty-connections','No principal romantic or friendship connection is mapped for this person at this point. Their family branch is shown above.'));
+  if(!list.length)panel.append(html('p','empty-connections','No romantic or sexual connection is mapped for this person at this point. Their family branch is shown above.'));
   list.forEach(r=>{
     const other=r.a===selected?r.b:r.a;const item=html('section','relationship-item');
     const b=html('button','partner-button',name(other));b.type='button';b.dataset.person=other;b.append(html('span','','↗'));item.append(b);
