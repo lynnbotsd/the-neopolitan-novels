@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=2256ebbe5337';
-import {people,relationships} from '../data.mjs?v=2256ebbe5337';
+import {snapshot,connections,validBook} from '../model.mjs?v=fbc2b55f278f';
+import {people,relationships} from '../data.mjs?v=fbc2b55f278f';
 
 test('dating is distinct from affairs and changes with the book',()=>{
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
@@ -68,4 +68,17 @@ test('book-specific characters and their edges do not carry into later books',()
   for(const book of [2,3])assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').past,true);
   assert.equal(snapshot(3).relationships.find(r=>r.id==='elena-gino').label,'Former boyfriend');
   assert.ok(snapshot(1).people.some(p=>p.id==='gino'));
+});
+
+test('Book 1 includes Enzo and Pasquale’s one-sided feelings without later spoilers',()=>{
+  const b1=snapshot(1);
+  for(const id of ['lila-enzo','lila-pasquale']){
+    const r=b1.relationships.find(r=>r.id===id);
+    assert.ok(r,id);assert.equal(r.type,'attraction');assert.ok(!r.past);
+    assert.deepEqual(r.children,[]);assert.equal(r.history.length,1);
+    assert.ok(connections(b1,'lila').some(c=>c.id===id));
+    assert.ok(connections(b1,id==='lila-enzo'?'enzo':'pasquale').some(c=>c.id===id));
+  }
+  assert.equal(snapshot(3).relationships.find(r=>r.id==='lila-enzo').type,'partnership');
+  assert.equal(snapshot(2).relationships.find(r=>r.id==='lila-pasquale').past,true);
 });

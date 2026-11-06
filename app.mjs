@@ -1,5 +1,5 @@
-import {books,typeLabels} from './data.mjs?v=2256ebbe5337';
-import {snapshot,connections,validBook} from './model.mjs?v=2256ebbe5337';
+import {books,typeLabels} from './data.mjs?v=fbc2b55f278f';
+import {snapshot,connections,validBook} from './model.mjs?v=fbc2b55f278f';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
