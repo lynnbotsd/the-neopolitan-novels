@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=84ca2571c0e9';
-import {people,relationships} from '../data.mjs?v=84ca2571c0e9';
+import {snapshot,connections,validBook} from '../model.mjs?v=79ebb61ebb22';
+import {people,relationships} from '../data.mjs?v=79ebb61ebb22';
 
 test('dating is distinct from affairs and changes with the book',()=>{
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
@@ -81,4 +81,13 @@ test('Book 1 includes Enzo and Pasquale’s one-sided feelings without later spo
   }
   assert.equal(snapshot(3).relationships.find(r=>r.id==='lila-enzo').type,'partnership');
   assert.equal(snapshot(2).relationships.find(r=>r.id==='lila-pasquale').past,true);
+});
+
+test('Elena and Donato are marked past only after Book 2',()=>{
+  for(const book of [1,2])assert.ok(!snapshot(book).relationships.find(r=>r.id==='elena-donato').past);
+  for(const book of [3,4]){
+    const r=snapshot(book).relationships.find(r=>r.id==='elena-donato');
+    assert.equal(r.past,true);assert.equal(r.type,'abuse');
+    assert.equal(r.label,'Past assault and sexual encounter');
+  }
 });
