@@ -1,4 +1,4 @@
-import {families,people,relationships} from './data.mjs?v=b713be49ec23';
+import {families,people,relationships} from './data.mjs?v=d9958661eef3';
 export const mappedRelationshipTypes = new Set(['marriage','partnership','dating','affair','attraction','relationship','abuse','encounter','pursuit']);
 export function validBook(value){const n=Number(value);return Number.isInteger(n)&&n>=1&&n<=4?n:1;}
 export function snapshot(bookValue){

@@ -31,10 +31,8 @@ export function routeConnections({positions,relationships,selected,labelFor}){
   }
   const routes=[];
   const obstacles=[...cards,{x:90,y:233,w:70,h:18}]; // generation heading
-  const gapYs=[194,244];
-  const rows=[...new Set(cards.filter(p=>!p.parent).map(p=>p.y))].sort((a,b)=>a-b);
-  for(let i=0;i<rows.length-1;i++)gapYs.push((rows[i]+rows[i+1])/2);
-  for(let i=0;i<=edges.length;i++)gapYs.push(bottom+30+i*28);
+  // Keep the horizontal stack entirely below every visible character card.
+  const laneYs=Array.from({length:edges.length+1},(_,i)=>bottom+40+i*44);
   for(const r of edges){
     const a=ports.get(r.id+':'+r.a),b=ports.get(r.id+':'+r.b);
     const other=r.a===selected?r.b:r.a;
@@ -53,8 +51,8 @@ export function routeConnections({positions,relationships,selected,labelFor}){
     }
     if(!text)throw Error('No label space for '+r.id);
     let best;
-    for(const y of gapYs){
-      if(routes.length&&y<routes.at(-1).label.y+24)continue;
+    for(const y of laneYs){
+      if(routes.length&&y<routes.at(-1).label.y+44)continue;
       const points=[{x:a.x,y:a.y},{x:a.rail,y:a.y},{x:a.rail,y},{x:b.rail,y},{x:b.rail,y:b.y},{x:b.x,y:b.y}];
       const parts=segments(points);
       if(parts.some(([s,t],i)=>obstacles.some(box=>{

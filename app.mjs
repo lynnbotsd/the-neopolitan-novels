@@ -1,6 +1,6 @@
-import {routeConnections,routePath} from './routing.mjs?v=b713be49ec23';
-import {books,typeLabels} from './data.mjs?v=b713be49ec23';
-import {snapshot,connections,validBook} from './model.mjs?v=b713be49ec23';
+import {routeConnections,routePath} from './routing.mjs?v=d9958661eef3';
+import {books,typeLabels} from './data.mjs?v=d9958661eef3';
+import {snapshot,connections,validBook} from './model.mjs?v=d9958661eef3';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -38,7 +38,7 @@ function nodeGraphic(p,pos,related){
 function drawMap(){
   layout=buildLayout();const svg=$('#family-map');svg.replaceChildren();svg.setAttribute('width',layout.width);svg.setAttribute('height',layout.height);svg.setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
   svg.append(el('title',{id:'map-title'},`Family relationships through Book ${book}`));
-  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. Lines trace ${name(selected)}’s known relationships through clear spaces between cards. Select a name for details.`));
+  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. Lines descend beside the cards to ${name(selected)}’s chronological connection stack below all names. Select a name for details.`));
   const lines=el('g',{'aria-hidden':'true'});svg.append(lines);
   state.families.forEach((f,i)=>{
     const cx=140+i*210;svg.append(el('text',{x:cx,y:48,'text-anchor':'middle',class:'family-heading'},f.name));

@@ -21,6 +21,6 @@
 
 - Relationship category labels describe relationships occurring anywhere during the selected book. Use “Past” only when the relationship occurs solely in earlier books; a breakup within the selected book does not make that whole book’s category “Past”.
 
-- Preserve the current left-to-right family order. Route connections through clear card gaps, use distinct ports and tracks, and keep labels clear of cards and other routes. Compact route labels name the other person; complete details and children remain in the sidebar.
+- Preserve the current left-to-right family order. Keep horizontal connection lanes and labels below all visible character cards; vertical stems run beside cards. Use distinct ports and tracks, and keep labels clear of cards and other routes. Compact route labels name the other person; complete details and children remain in the sidebar.
 
 - Stack connection lanes and sidebar entries chronologically by first attraction or involvement, independently of family columns. Do not add visible sequence numbers. Preserve overlapping/uncertain timing labels; later relationship status changes must not reorder the original connection.

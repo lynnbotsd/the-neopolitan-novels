@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections} from '../model.mjs?v=b713be49ec23';
-import {typeLabels} from '../data.mjs?v=b713be49ec23';
-import {routeConnections,segmentHitsBox} from '../routing.mjs?v=b713be49ec23';
+import {snapshot,connections} from '../model.mjs?v=d9958661eef3';
+import {typeLabels} from '../data.mjs?v=d9958661eef3';
+import {routeConnections,segmentHitsBox} from '../routing.mjs?v=d9958661eef3';
 function fixture(state,selected){
   const positions=new Map();
   state.families.forEach((f,i)=>{
@@ -21,10 +21,12 @@ test('every character in every book has routes clear of cards and other labels',
       const input=fixture(state,person.id),before=JSON.stringify([...input.positions]),result=routeConnections(input);
       assert.equal(result.routes.length,input.relationships.length,`${book}/${person.id}`);
       assert.deepEqual(result.routes.map(r=>r.id),input.relationships.map(r=>r.id),'Map and sidebar chronology differ');
-      assert.ok(result.routes.every((r,i,a)=>!i||r.label.y>=a[i-1].label.y+24),'Chronological lanes are not top to bottom');
+      assert.ok(result.routes.every((r,i,a)=>!i||r.label.y>=a[i-1].label.y+44),'Chronological lanes are not top to bottom');
       assert.equal(JSON.stringify([...input.positions]),before,'Routing moved a character');
       for(const route of result.routes){
         const {points,relationship:r,label}=route;
+        const cardBottom=Math.max(...[...input.positions.values()].map(p=>p.y+p.h/2));
+        assert.ok(label.y-label.h/2>cardBottom,'A chronological lane is still among character cards');
         for(let i=1;i<points.length;i++){
           assert.ok(points[i].x===points[i-1].x||points[i].y===points[i-1].y);
           for(const [id,card]of input.positions){
@@ -39,13 +41,13 @@ test('every character in every book has routes clear of cards and other labels',
     }
   }
 });
-test('Elena uses separate ports and nearby gaps instead of bottom loops',()=>{
+test('Elena uses separate ports and chronological lanes below the character cards',()=>{
   const input=fixture(snapshot(1),'elena'),result=routeConnections(input);
   const starts=result.routes.map(r=>r.relationship.a==='elena'?r.points[0]:r.points.at(-1));
   assert.equal(new Set(starts.map(p=>p.y)).size,starts.length);
   const antonio=result.routes.find(r=>r.id==='elena-antonio');
   const bottom=Math.max(...[...input.positions.values()].map(p=>p.y+p.h/2));
-  assert.ok(antonio.label.y<bottom);
+  assert.ok(antonio.label.y>bottom);
   assert.deepEqual(routeConnections(input),result,'Routes must be deterministic');
 });
 
