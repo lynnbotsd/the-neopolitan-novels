@@ -1,6 +1,6 @@
-import {routeConnections,routePath} from './routing.mjs?v=6975619567b7';
-import {books,typeLabels} from './data.mjs?v=6975619567b7';
-import {snapshot,connections,validBook} from './model.mjs?v=6975619567b7';
+import {routeConnections,routePath} from './routing.mjs?v=1939ae38b125';
+import {books,typeLabels} from './data.mjs?v=1939ae38b125';
+import {snapshot,connections,validBook} from './model.mjs?v=1939ae38b125';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -25,7 +25,7 @@ function buildLayout(){
   const outsideX=140+state.families.length*210;
   visibleOutside.forEach((p,i)=>positions.set(p.id,{x:outsideX,y:280+i*61,w:168,h:42,outside:true}));
   const width=Math.max(1500,(state.families.length+(visibleOutside.length?1:0))*210+70);
-  const routed=routeConnections({positions,relationships:list,selected,labelFor:(r,id)=>({name:person(id).label,category:(r.past?'Past ':'')+typeLabels[r.type]})});
+  const routed=routeConnections({positions,relationships:list,selected,labelFor:(r,id)=>({name:person(r.a).label+' + '+person(r.b).label,category:(r.past?'Past ':'')+typeLabels[r.type]})});
   return {width,height:routed.height,positions,outside,visibleOutside,outsideX,list,routes:routed.routes};
 }
 function nodeGraphic(p,pos,related){
@@ -67,15 +67,16 @@ function drawMap(){
     group.append(el('path',{d,class:'connection-clearance'}));
     group.append(el('path',{d,class:'connection-line '+r.type}));
     edges.append(group);
-    const {x,y,w,h}=route.label;
-    labels.append(el('rect',{x:x-w/2,y:y-h/2,width:w,height:h,class:'connection-label-bg'}));
+    const {x,w}=route.label,y=route.laneY;
+    labels.append(el('rect',{x:x-w/2,y:y-13,width:w,height:26,class:'connection-label-bg'}));
     const label=el('text',{x,y:y+3.5,class:'connection-label','data-relationship':r.id},route.text);
     label.append(el('title',{},person(r.a).label+' + '+person(r.b).label+' · '+r.label+(r.children.length?' · Children: '+r.children.join(', '):'')));
     labels.append(label);
+    labels.append(el('text',{x,y:y+31,class:'child-label relationship-label','data-relationship':r.id},route.subtitle));
   });
   svg.append(edges,labels);
   state.people.filter(p=>layout.positions.has(p.id)).forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
-  $('#map-caption').textContent=`Book ${book} · Earliest connection at top · Labels name the other person`;
+  $('#map-caption').textContent=`Book ${book} · Earliest connection at top · Relationship type below each pair`;
   resizeMap();
 }
 function drawLegend(){

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections} from '../model.mjs?v=6975619567b7';
-import {typeLabels} from '../data.mjs?v=6975619567b7';
-import {routeConnections,segmentHitsBox} from '../routing.mjs?v=6975619567b7';
+import {snapshot,connections} from '../model.mjs?v=1939ae38b125';
+import {typeLabels} from '../data.mjs?v=1939ae38b125';
+import {routeConnections,segmentHitsBox} from '../routing.mjs?v=1939ae38b125';
 function fixture(state,selected){
   const positions=new Map();
   state.families.forEach((f,i)=>{
@@ -12,7 +12,7 @@ function fixture(state,selected){
   });
   const relationships=connections(state,selected),connected=new Set([selected,...relationships.flatMap(r=>[r.a,r.b])]);
   state.people.filter(p=>!positions.has(p.id)&&connected.has(p.id)).forEach((p,i)=>positions.set(p.id,{x:140+state.families.length*210,y:280+i*61,w:168,h:42}));
-  return {positions,relationships,selected,labelFor:(r,id)=>({name:state.people.find(p=>p.id===id).label,category:typeLabels[r.type]})};
+  return {positions,relationships,selected,labelFor:(r,id)=>({name:state.people.find(p=>p.id===r.a).label+' + '+state.people.find(p=>p.id===r.b).label,category:(r.past?'Past ':'')+typeLabels[r.type]})};
 }
 test('every character in every book has routes clear of cards and other labels',()=>{
   for(let book=1;book<=4;book++){
@@ -21,7 +21,7 @@ test('every character in every book has routes clear of cards and other labels',
       const input=fixture(state,person.id),before=JSON.stringify([...input.positions]),result=routeConnections(input);
       assert.equal(result.routes.length,input.relationships.length,`${book}/${person.id}`);
       assert.deepEqual(result.routes.map(r=>r.id),input.relationships.map(r=>r.id),'Map and sidebar chronology differ');
-      assert.ok(result.routes.every((r,i,a)=>!i||r.label.y>=a[i-1].label.y+44),'Chronological lanes are not top to bottom');
+      assert.ok(result.routes.every((r,i,a)=>!i||r.label.y>=a[i-1].label.y+64),'Chronological lanes are not top to bottom');
       assert.equal(JSON.stringify([...input.positions]),before,'Routing moved a character');
       for(const route of result.routes){
         const {points,relationship:r,label}=route;
@@ -37,6 +37,8 @@ test('every character in every book has routes clear of cards and other labels',
         }
         for(const card of input.positions.values())assert.ok(Math.abs(label.x-card.x)>=(label.w+card.w)/2||Math.abs(label.y-card.y)>=(label.h+card.h)/2,'Label overlaps a card');
         assert.ok(label.y+label.h/2<result.height);
+        assert.equal(route.subtitle,input.labelFor(r).category,'Relationship type disappeared from the map');
+        assert.ok(route.text.includes(' + '),'Pair names disappeared');
       }
     }
   }

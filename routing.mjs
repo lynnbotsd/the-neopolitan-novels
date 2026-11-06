@@ -32,46 +32,45 @@ export function routeConnections({positions,relationships,selected,labelFor}){
   const routes=[];
   const obstacles=[...cards,{x:90,y:233,w:70,h:18}]; // generation heading
   // Keep the horizontal stack entirely below every visible character card.
-  const laneYs=Array.from({length:edges.length+1},(_,i)=>bottom+40+i*44);
+  const laneYs=Array.from({length:edges.length+1},(_,i)=>bottom+44+i*64);
   for(const r of edges){
     const a=ports.get(r.id+':'+r.a),b=ports.get(r.id+':'+r.b);
     const other=r.a===selected?r.b:r.a;
-    const labels=labelFor(r,other),span=Math.abs(a.rail-b.rail);
-    const full=labels.name+' · '+labels.category;
+    const labels=labelFor(r,other);
     // Keep labels between rail columns, including rails of connections routed later.
     // This prevents an early label from blocking a later chronological lane.
     const railXs=[...new Set([...ports.values()].map(p=>p.rail))].sort((x,y)=>x-y);
     const low=Math.min(a.rail,b.rail),high=Math.max(a.rail,b.rail);
     const intervals=railXs.slice(1).map((x,i)=>[Math.max(low+8,railXs[i]+6),Math.min(high-8,x-6)]).filter(([l,h])=>h>l);
     let text,labelWidth,labelX;
-    for(const candidate of [full,labels.name]){
-      const w=Math.max(56,candidate.length*6.5+20);
+    for(const candidate of [labels.name]){
+      const w=Math.max(56,candidate.length*6+20,labels.category.length*5.2+16);
       const slots=intervals.filter(([l,h])=>h-l>=w).map(([l,h])=>Math.max(l+w/2,Math.min((low+high)/2,h-w/2)));
       if(slots.length){text=candidate;labelWidth=w;labelX=slots.sort((x,y)=>Math.abs(x-(low+high)/2)-Math.abs(y-(low+high)/2))[0];break;}
     }
     if(!text)throw Error('No label space for '+r.id);
     let best;
     for(const y of laneYs){
-      if(routes.length&&y<routes.at(-1).label.y+44)continue;
+      if(routes.length&&y<routes.at(-1).laneY+64)continue;
       const points=[{x:a.x,y:a.y},{x:a.rail,y:a.y},{x:a.rail,y},{x:b.rail,y},{x:b.rail,y:b.y},{x:b.x,y:b.y}];
       const parts=segments(points);
       if(parts.some(([s,t],i)=>obstacles.some(box=>{
         if((i===0&&box===positions.get(r.a))||(i===parts.length-1&&box===positions.get(r.b)))return false;
         return segmentHitsBox(s,t,box,1);
       })))continue;
-      const label={x:labelX,y,w:labelWidth,h:16};
+      const label={x:labelX,y:y+10,w:labelWidth,h:52};
       if(obstacles.some(box=>overlap(label,box,1)))continue;
       if(routes.some(route=>overlap(label,route.label,5)||parts.some(([s,t])=>segmentHitsBox(s,t,route.label,3))||segments(route.points).some(([s,t])=>segmentHitsBox(s,t,label,3))))continue;
       // Never share a horizontal track over the same span.
-      if(routes.some(route=>route.label.y===y&&Math.max(Math.min(a.rail,b.rail),Math.min(route.points[2].x,route.points[3].x))<Math.min(Math.max(a.rail,b.rail),Math.max(route.points[2].x,route.points[3].x))))continue;
+      if(routes.some(route=>route.laneY===y&&Math.max(Math.min(a.rail,b.rail),Math.min(route.points[2].x,route.points[3].x))<Math.min(Math.max(a.rail,b.rail),Math.max(route.points[2].x,route.points[3].x))))continue;
       const crossings=routes.reduce((sum,route)=>sum+parts.reduce((n,[s,t])=>n+segments(route.points).filter(([u,v])=>crosses(s,t,u,v)).length,0),0);
       const length=parts.reduce((sum,[s,t])=>sum+Math.abs(s.x-t.x)+Math.abs(s.y-t.y),0);
       const score=length+crossings*24;
-      if(!best||score<best.score)best={id:r.id,relationship:r,points,label,text,score};
+      if(!best||score<best.score)best={id:r.id,relationship:r,points,label,laneY:y,text,subtitle:labels.category,score};
     }
     if(!best)throw Error('No clear route for '+r.id+' selected='+selected);
     routes.push(best);
   }
-  return {routes,height:Math.max(bottom+45,...routes.map(r=>r.label.y+35))};
+  return {routes,height:Math.max(bottom+45,...routes.map(r=>r.label.y+45))};
 }
 export function routePath(points){return points.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');}
