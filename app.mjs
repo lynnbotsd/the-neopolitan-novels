@@ -1,5 +1,6 @@
-import {books,typeLabels} from './data.mjs?v=79ebb61ebb22';
-import {snapshot,connections,validBook} from './model.mjs?v=79ebb61ebb22';
+import {routeConnections,routePath} from './routing.mjs?v=ba4471fc9e8c';
+import {books,typeLabels} from './data.mjs?v=ba4471fc9e8c';
+import {snapshot,connections,validBook} from './model.mjs?v=ba4471fc9e8c';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -24,8 +25,8 @@ function buildLayout(){
   const outsideX=140+state.families.length*210;
   visibleOutside.forEach((p,i)=>positions.set(p.id,{x:outsideX,y:280+i*61,w:168,h:42,outside:true}));
   const width=Math.max(1500,(state.families.length+(visibleOutside.length?1:0))*210+70);
-  const connectionTop=Math.max(...[...positions.values()].map(p=>p.y))+110;
-  return {width,height:connectionTop+Math.max(1,list.length)*70+50,positions,outside,visibleOutside,outsideX,connectionTop,list};
+  const routed=routeConnections({positions,relationships:list,selected,labelFor:(r,id)=>({name:person(id).label,category:(r.past?'Past ':'')+typeLabels[r.type]})});
+  return {width,height:routed.height,positions,outside,visibleOutside,outsideX,list,routes:routed.routes};
 }
 function nodeGraphic(p,pos,related){
   const g=el('g',{class:'person-node'+(pos.parent?' parent':'')+(p.id===selected?' selected':related.has(p.id)?' related':''),role:'button',tabindex:'0','aria-label':name(p.id)+(p.subtitle?', '+p.subtitle:'')+'; show connections','aria-pressed':String(p.id===selected),'data-person':p.id,transform:`translate(${pos.x},${pos.y})`});
@@ -37,7 +38,7 @@ function nodeGraphic(p,pos,related){
 function drawMap(){
   layout=buildLayout();const svg=$('#family-map');svg.replaceChildren();svg.setAttribute('width',layout.width);svg.setAttribute('height',layout.height);svg.setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
   svg.append(el('title',{id:'map-title'},`Family relationships through Book ${book}`));
-  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. Lines below trace ${name(selected)}’s known relationships. Select a name for details.`));
+  svg.append(el('desc',{id:'map-desc'},`${state.families.length} families aligned across the top. Parent branches descend to their children. Lines trace ${name(selected)}’s known relationships through clear spaces between cards. Select a name for details.`));
   const lines=el('g',{'aria-hidden':'true'});svg.append(lines);
   state.families.forEach((f,i)=>{
     const cx=140+i*210;svg.append(el('text',{x:cx,y:48,'text-anchor':'middle',class:'family-heading'},f.name));
@@ -51,7 +52,7 @@ function drawMap(){
     }else lines.append(el('path',{d:`M${cx-83} 240 V${childBottom}`,class:'family-line'}));
     f.children.forEach(id=>{const p=layout.positions.get(id);lines.append(el('path',{d:`M${cx-83} ${p.y} H${p.x-p.w/2}`,class:'family-line'}));});
   });
-  svg.append(el('text',{x:56,y:235,class:'generation-label'},'THE CHILDHOOD GENERATION'));
+  svg.append(el('text',{x:56,y:235,class:'generation-label'},'CHILDREN'));
   if(layout.visibleOutside.length){
     svg.append(el('text',{x:layout.outsideX,y:48,'text-anchor':'middle',class:'family-heading'},'Other characters'));
     svg.append(el('text',{x:layout.outsideX,y:71,'text-anchor':'middle',class:'family-trade'},'Connected to '+person(selected).label));
@@ -59,23 +60,22 @@ function drawMap(){
   }
   const nodes=el('g');const related=new Set(layout.list.flatMap(r=>[r.a,r.b]));
   const edges=el('g',{'aria-hidden':'true'});
-  layout.list.forEach((r,i)=>{
-    const a=layout.positions.get(r.a),b=layout.positions.get(r.b),y=layout.connectionTop+i*70;
-    const ax=a.x+a.w/2,bx=b.x+b.w/2,ag=ax+13,bg=bx+13;
-    const min=Math.min(ag,bg),max=Math.max(ag,bg),center=(min+max)/2;
-    let d=`M${ax} ${a.y} H${ag} V${y-8} Q${ag} ${y} ${ag+8} ${y} H${bg-8} Q${bg} ${y} ${bg} ${y-8} V${b.y} H${bx}`;
-    if(ag>bg)d=`M${ax} ${a.y} H${ag} V${y-8} Q${ag} ${y} ${ag-8} ${y} H${bg+8} Q${bg} ${y} ${bg} ${y-8} V${b.y} H${bx}`;
-    edges.append(el('path',{d,class:'connection-line '+r.type}));
-    const label=person(r.a).label+' + '+person(r.b).label;
-    const labelWidth=Math.max(180,label.length*6.5+24);
-    edges.append(el('rect',{x:center-labelWidth/2,y:y-15,width:labelWidth,height:30,class:'connection-label-bg'}));
-    edges.append(el('text',{x:center,y:y+4,class:'connection-label'},label));
-    const sub=r.children.length?'↓ '+r.children.join(' · '):(r.past?'Past '+typeLabels[r.type].toLowerCase():typeLabels[r.type]);
-    edges.append(el('text',{x:center,y:y+32,class:'child-label'},sub));
+  const labels=el('g',{'aria-hidden':'true'});
+  layout.routes.forEach(route=>{
+    const r=route.relationship,d=routePath(route.points);
+    const group=el('g',{'data-relationship':r.id});
+    group.append(el('path',{d,class:'connection-clearance'}));
+    group.append(el('path',{d,class:'connection-line '+r.type}));
+    edges.append(group);
+    const {x,y,w,h}=route.label;
+    labels.append(el('rect',{x:x-w/2,y:y-h/2,width:w,height:h,class:'connection-label-bg'}));
+    const label=el('text',{x,y:y+3.5,class:'connection-label'},route.text);
+    label.append(el('title',{},person(r.a).label+' + '+person(r.b).label+' · '+r.label+(r.children.length?' · Children: '+r.children.join(', '):'')));
+    labels.append(label);
   });
-  svg.append(edges);
+  svg.append(edges,labels);
   state.people.filter(p=>layout.positions.has(p.id)).forEach(p=>nodes.append(nodeGraphic(p,layout.positions.get(p.id),related)));svg.append(nodes);
-  $('#map-caption').textContent=`Book ${book} · ${name(selected)}’s connections`;
+  $('#map-caption').textContent=`Book ${book} · Connections from ${name(selected)} · Labels name the other person`;
   resizeMap();
 }
 function drawLegend(){

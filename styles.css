@@ -18,3 +18,5 @@
 @media(max-width:740px){.other-characters{padding:12px 18px;gap:10px;flex-direction:column}.other-characters-heading{display:flex;align-items:center;gap:10px}.other-characters-heading h3{margin:0}.other-character{min-height:40px;justify-content:center}}
 
 @media(max-width:740px){.legend-note{padding-inline:18px}}
+
+.connection-clearance{fill:none;stroke:var(--surface);stroke-width:5;stroke-linejoin:round;stroke-linecap:round;pointer-events:none}.connection-line{stroke-linejoin:round;stroke-linecap:round}.connection-label-bg{fill:var(--surface);stroke:none;rx:3}.connection-label{font-size:11px}

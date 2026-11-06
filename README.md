@@ -20,6 +20,7 @@ Open http://localhost:8080. GitHub Pages publishes the root of `main`.
 - Character `appearsIn` arrays restrict visibility to specific books, independently of when a character was introduced. Older relationship history does not imply ongoing dating. Appearance overrides currently cover Gino, Bruno and Manuela; remaining characters still need a full appearance audit.
 - `model.mjs`: builds a snapshot with no future people or versions. All visible text and map labels must come from this snapshot.
 - `app.mjs`: map, character details, and interaction.
+- `routing.mjs`: deterministic connection routing through card gaps, separate endpoint ports, collision checks and compact labels. Family positions do not move.
 - `styles.css`: the standalone interface.
 - `tests/spoilers.test.mjs`: book cutoffs and key spoiler regressions.
 
@@ -31,7 +32,6 @@ Use GitHub issues for UI ideas and plot corrections. Changes pushed to `main` au
 
 ## Next UI iterations
 
-- Improve routing and spacing when several relationship lines share a family column.
 - Add an accessible list view alongside the spatial map.
 - Review each book cutoff against chapter-level references.
 - Add a chapter selector if finer spoiler protection is wanted.

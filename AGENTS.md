@@ -20,3 +20,5 @@
 - Keep the Other characters directory outside the map canvas, above it. Only selected/connected characters without a family column appear in the map, in a dedicated rightmost column; never put an unrelated row through connection routes.
 
 - Relationship category labels describe relationships occurring anywhere during the selected book. Use “Past” only when the relationship occurs solely in earlier books; a breakup within the selected book does not make that whole book’s category “Past”.
+
+- Preserve the current left-to-right family order. Route connections through clear card gaps, use distinct ports and tracks, and keep labels clear of cards and other routes. Compact route labels name the other person; complete details and children remain in the sidebar.
