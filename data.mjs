@@ -1,7 +1,7 @@
 // Book cutoffs are REVELATION dates, not necessarily event dates.
 // Do not put future plot information in a character's static role or label.
 export const books = ['My Brilliant Friend','The Story of a New Name','Those Who Leave and Those Who Stay','The Story of the Lost Child'];
-const person = (id, label, role, introduced=1, subtitle='') => ({ id, label, role, introduced, ...(subtitle?{subtitle}:{}) });
+const person = (id, label, role, introduced=1, subtitle='', appearsIn) => ({ id, label, role, introduced, ...(subtitle?{subtitle}:{}), ...(appearsIn?{appearsIn}:{}) });
 export const families = [
   {id:'greco',name:'Greco',trade:'The porter’s family',parents:['vittorio','immacolata'],children:['elena','elisa','peppe','gianni']},
   {id:'cappuccio',name:'Cappuccio',trade:'Melina’s family',parents:['melina'],children:['antonio','ada']},
@@ -24,20 +24,21 @@ export const people = [
   person('achille','Don Achille','Father of Stefano, Pinuccia, and Alfonso'),person('maria','Maria','Mother of Stefano, Pinuccia, and Alfonso'),person('stefano','Stefano','Don Achille’s eldest son'),person('pinuccia','Pinuccia','Stefano and Alfonso’s sister'),person('alfonso','Alfonso','Stefano’s younger brother; Elena’s schoolmate'),
   person('nicola','Nicola','Enzo’s father; fruit seller'),person('assunta','Assunta','Enzo’s mother; fruit seller'),person('enzo','Enzo','Son of the fruit sellers'),
   person('alfredo','Alfredo','Carpenter; father of Pasquale and Carmen'),person('giuseppina','Giuseppina','Mother of Pasquale and Carmen'),person('pasquale','Pasquale','Construction worker; Carmen’s brother'),person('carmen','Carmen / Carmela','Pasquale’s sister'),
-  person('silvio','Silvio','Father of Marcello and Michele'),person('manuela','Manuela','Mother of Marcello and Michele'),person('marcello','Marcello','Michele’s brother'),person('michele','Michele','Marcello’s brother'),person('gigliola','Gigliola','The pastry maker’s daughter'),
+  person('silvio','Silvio','Father of Marcello and Michele'),person('manuela','Manuela','Mother of Marcello and Michele',1,'',[1,2,3]),person('marcello','Marcello','Michele’s brother'),person('michele','Michele','Marcello’s brother'),person('gigliola','Gigliola','The pastry maker’s daughter'),
   person('guido','Guido','Pietro and Mariarosa’s father',2),person('adele','Adele','Pietro and Mariarosa’s mother',2),person('pietro','Pietro','Son of the Airota family',2),person('mariarosa','Mariarosa','Pietro’s sister',2),
   person('profgaliani','Professor Galiani','Elena’s teacher; Nadia’s mother',2),person('nadia','Nadia','Professor Galiani’s daughter',2),
-  person('gino','Gino','The pharmacist’s son',1,'The pharmacist’s son'),person('franco','Franco Mari','Elena’s university acquaintance',2),person('bruno','Bruno Soccavo','Nino’s friend; son of a factory owner',2),
+  person('gino','Gino','The pharmacist’s son',1,'The pharmacist’s son',[1,2,3]),person('franco','Franco Mari','Elena’s university acquaintance',2),person('bruno','Bruno Soccavo','Nino’s friend; son of a factory owner',2,'',[2,3]),
   person('roberto','Roberto','The gas-station man',2),person('eleonora','Eleonora','From a wealthy Neapolitan family',3),person('silvia','Silvia','A young mother in Mariarosa’s circle',3),
   person('germanwife','Antonio’s wife','A German woman; not a neighborhood family member',4),person('silvana','Silvana','A housekeeper',4),person('mirella','Mirella','A babysitter',4),person('gynecologist','The gynecologist','A doctor known to Nino',4)
 ];
+// appearsIn is an explicit book visibility override; absence from later scenes must be checked, not inferred from a lack of relationship updates.
 // A version is cumulative knowledge through the end of that book.
 // Children and uncertain paternity belong inside versions so later revelations cannot leak backward.
 const v = (book,label,children=[],note='',type) => ({book,label,children,note,...(type?{type}:{})});
 export const relationships = [
   {id:'elena-antonio',a:'elena',b:'antonio',type:'dating',versions:[v(1,'Dating'),v(2,'Their youthful relationship ends'),v(4,'Former partners; a later sexual encounter',[],'Antonio is married when they sleep together again.','encounter')]},
   {id:'elena-donato',a:'elena',b:'donato',type:'abuse',versions:[v(1,'Sexual assault on Ischia',[],'Donato assaults Elena when she is fifteen. This is not a dating relationship.'),v(2,'Earlier assault; later sexual encounter',[],'At seventeen Elena has intercourse with Donato on the beach. Their history is exploitative; he is an adult who already assaulted her.')]},
-  {id:'elena-gino',a:'elena',b:'gino',type:'dating',versions:[v(1,'Dating')]},
+  {id:'elena-gino',a:'elena',b:'gino',type:'dating',versions:[{...v(1,'Youthful dating; relationship ends'),past:true},{...v(2,'Former boyfriend'),past:true}]},
   {id:'elena-franco',a:'elena',b:'franco',type:'dating',versions:[v(2,'University relationship; later ends')]},
   {id:'elena-pietro',a:'elena',b:'pietro',type:'marriage',versions:[v(2,'Engaged'),v(3,'Marriage; Elena leaves at the end of the book',['Dede','Elsa']),v(4,'Separated; continuing ties as parents',['Dede','Elsa'])]},
   {id:'elena-nino',a:'elena',b:'nino',type:'attraction',versions:[v(1,'Elena’s longstanding crush',[],'A kiss on Ischia does not become a sustained relationship.'),v(2,'Elena remains in love with Nino'),v(3,'An affair begins',[],'','affair'),v(4,'Shared household; eventual breakup',['Imma'],'Nino maintains his marriage to Eleonora.','affair')]},

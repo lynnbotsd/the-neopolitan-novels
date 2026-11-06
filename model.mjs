@@ -1,9 +1,9 @@
-import {families,people,relationships} from './data.mjs?v=d93b0cf1397e';
+import {families,people,relationships} from './data.mjs?v=d3e61560dcf7';
 export const mappedRelationshipTypes = new Set(['marriage','partnership','dating','affair','attraction','relationship','abuse','encounter','pursuit']);
 export function validBook(value){const n=Number(value);return Number.isInteger(n)&&n>=1&&n<=4?n:1;}
 export function snapshot(bookValue){
   const book=validBook(bookValue);
-  const visiblePeople=people.filter(p=>p.introduced<=book);
+  const visiblePeople=people.filter(p=>p.introduced<=book&&(!p.appearsIn||p.appearsIn.includes(book)));
   const ids=new Set(visiblePeople.map(p=>p.id));
   const visibleRelationships=relationships.flatMap(r=>{
     if(!mappedRelationshipTypes.has(r.type))return [];

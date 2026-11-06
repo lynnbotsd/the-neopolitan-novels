@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=d93b0cf1397e';
-import {people,relationships} from '../data.mjs?v=d93b0cf1397e';
+import {snapshot,connections,validBook} from '../model.mjs?v=d3e61560dcf7';
+import {people,relationships} from '../data.mjs?v=d3e61560dcf7';
 
 test('dating is distinct from affairs and changes with the book',()=>{
-  for(let book=1;book<=4;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
+  for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-antonio').type,'dating');
   assert.equal(snapshot(4).relationships.find(r=>r.id==='elena-antonio').type,'encounter');
   assert.equal(snapshot(1).relationships.find(r=>r.id==='elena-nino').type,'attraction');
@@ -55,4 +55,16 @@ test('Elena and Nino’s connection changes without leaking Imma into Book 3',()
 });
 test('every visible connection has visible endpoints at every cutoff',()=>{
   for(let book=1;book<=4;book++){const s=snapshot(book),ids=new Set(s.people.map(p=>p.id));for(const r of s.relationships)assert.ok(ids.has(r.a)&&ids.has(r.b));}
+});
+
+test('book-specific characters and their edges do not carry into later books',()=>{
+  for(const id of ['gino','bruno','manuela']){
+    assert.ok(snapshot(3).people.some(p=>p.id===id));
+    assert.ok(!snapshot(4).people.some(p=>p.id===id));
+    assert.ok(!snapshot(4).relationships.some(r=>r.a===id||r.b===id));
+    assert.ok(snapshot(4).families.every(f=>!f.parents.includes(id)&&!f.children.includes(id)));
+  }
+  assert.equal(snapshot(1).relationships.find(r=>r.id==='elena-gino').past,true);
+  assert.equal(snapshot(3).relationships.find(r=>r.id==='elena-gino').label,'Former boyfriend');
+  assert.ok(snapshot(1).people.some(p=>p.id==='gino'));
 });

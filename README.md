@@ -17,6 +17,7 @@ Open http://localhost:8080. GitHub Pages publishes the root of `main`.
 ## Editing together
 
 - `data.mjs`: families, people, and relationship versions. Every version has the **book in which the information is revealed**, not the date the event happens.
+- Character `appearsIn` arrays restrict visibility to specific books, independently of when a character was introduced. Older relationship history does not imply ongoing dating. Appearance overrides currently cover Gino, Bruno and Manuela; remaining characters still need a full appearance audit.
 - `model.mjs`: builds a snapshot with no future people or versions. All visible text and map labels must come from this snapshot.
 - `app.mjs`: map, character details, and interaction.
 - `styles.css`: the standalone interface.

@@ -1,5 +1,5 @@
-import {books,typeLabels} from './data.mjs?v=d93b0cf1397e';
-import {snapshot,connections,validBook} from './model.mjs?v=d93b0cf1397e';
+import {books,typeLabels} from './data.mjs?v=d3e61560dcf7';
+import {snapshot,connections,validBook} from './model.mjs?v=d3e61560dcf7';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -70,7 +70,7 @@ function drawMap(){
     const labelWidth=Math.max(180,label.length*6.5+24);
     edges.append(el('rect',{x:center-labelWidth/2,y:y-15,width:labelWidth,height:30,class:'connection-label-bg'}));
     edges.append(el('text',{x:center,y:y+4,class:'connection-label'},label));
-    const sub=r.children.length?'↓ '+r.children.join(' · '):typeLabels[r.type];
+    const sub=r.children.length?'↓ '+r.children.join(' · '):(r.past?'Past '+typeLabels[r.type].toLowerCase():typeLabels[r.type]);
     edges.append(el('text',{x:center,y:y+32,class:'child-label'},sub));
   });
   svg.append(edges);
@@ -81,7 +81,7 @@ function drawMap(){
 function drawOtherCharacters(){
   const list=$('#other-character-list');list.replaceChildren();
   $('#other-characters').hidden=!layout.outside.length;
-  $('#other-characters-book').textContent='Introduced by Book '+book;
+  $('#other-characters-book').textContent='In Book '+book;
   const related=new Set(layout.list.flatMap(r=>[r.a,r.b]));
   layout.outside.forEach(p=>{
     const b=html('button','other-character'+(related.has(p.id)?' connected':''));
@@ -103,7 +103,7 @@ function drawPanel(){
     const other=r.a===selected?r.b:r.a;const item=html('section','relationship-item');
     const b=html('button','partner-button',name(other));b.type='button';b.dataset.person=other;b.append(html('span','','↗'));item.append(b);
     if(person(other).subtitle)item.append(html('p','partner-subtitle',person(other).subtitle));
-    item.append(html('p','relationship-type',typeLabels[r.type]));item.append(html('p','relationship-status',r.label));
+    item.append(html('p','relationship-type',(r.past?'Past '+typeLabels[r.type].toLowerCase():typeLabels[r.type])));item.append(html('p','relationship-status',r.label));
     if(r.children.length){const c=html('p','children');c.append(html('strong','','Children · '));c.append(document.createTextNode(r.children.join(', ')));item.append(c);}
     if(r.note)item.append(html('p','relationship-note',r.note));
     if(r.history.length>1){const detail=html('details'),sum=html('summary','','How this changes across the books'),ol=html('ol');r.history.forEach(v=>ol.append(html('li','',`Book ${v.book}: ${v.label}`)));detail.append(sum,ol);item.append(detail);}
@@ -112,7 +112,7 @@ function drawPanel(){
 }
 function resizeMap(){if(!layout)return;$('#family-map').style.transform=`scale(${zoom})`;$('#map-size').style.width=layout.width*zoom+'px';$('#map-size').style.height=layout.height*zoom+'px';$('#zoom-label').textContent=Math.round(zoom*100)+'%';}
 function render(){drawMap();drawOtherCharacters();drawPanel();}
-function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected='elena';document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Showing only information revealed through the end of Book ${book}.`;render();}
+function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected='elena';document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Characters in Book ${book}; information revealed through its ending.`;render();}
 function selectPerson(id){if(!person(id))return;selected=id;render();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-book]');if(b)setBook(b.dataset.book);const p=e.target.closest('[data-person]');if(p){const fromDirectory=Boolean(p.closest('#other-characters'));selectPerson(p.dataset.person);if(fromDirectory){const pos=layout.positions.get(selected);$('#map-scroll').scrollTo({left:Math.max(0,pos.x*zoom-$('#map-scroll').clientWidth/2),top:Math.max(0,pos.y*zoom-130)});$('#other-character-list').querySelector(`[data-person="${selected}"]`)?.focus({preventScroll:true});}}});
 $('#family-map').addEventListener('keydown',e=>{const p=e.target.closest('[data-person]');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectPerson(p.dataset.person);const restored=$('#family-map').querySelector(`[data-person="${selected}"]`);restored?.focus({preventScroll:true});}});
