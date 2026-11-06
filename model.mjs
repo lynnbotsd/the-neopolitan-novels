@@ -1,10 +1,12 @@
-import {families,people,relationships} from './data.mjs';
+import {families,people,relationships} from './data.mjs?v=7e904acbe6be';
+export const mappedRelationshipTypes = new Set(['marriage','partnership','romance','abuse','encounter','pursuit']);
 export function validBook(value){const n=Number(value);return Number.isInteger(n)&&n>=1&&n<=4?n:1;}
 export function snapshot(bookValue){
   const book=validBook(bookValue);
   const visiblePeople=people.filter(p=>p.introduced<=book);
   const ids=new Set(visiblePeople.map(p=>p.id));
   const visibleRelationships=relationships.flatMap(r=>{
+    if(!mappedRelationshipTypes.has(r.type))return [];
     const history=r.versions.filter(v=>v.book<=book);
     if(!history.length||!ids.has(r.a)||!ids.has(r.b))return [];
     // Never return future versions, even in an otherwise-hidden data attribute.

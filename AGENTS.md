@@ -11,4 +11,5 @@
 - Families stay aligned across the top; parents branch to children. Preserve zoom and horizontal exploration while improving connection routing.
 - Check factual changes against the novels, not just the preceding chat. Uncertain interpretations must be identified as such.
 - Run `npm test` after data/model changes and check relevant UI behavior after interface changes.
+- Run `npm run build` before publishing any browser-source changes. This versions the entry script, stylesheet, and every imported module together to prevent mixed cached releases.
 - Do not add tokens, personal information, chat transcripts, or scratch files to this public repository.

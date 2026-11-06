@@ -8,6 +8,7 @@ Requires Node.js 18+ for tests and Python 3 for the development server. No npm d
 
 ```sh
 npm test
+npm run build
 npm start
 ```
 

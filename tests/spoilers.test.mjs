@@ -1,7 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs';
-import {people,relationships} from '../data.mjs';
+import {snapshot,connections,validBook} from '../model.mjs?v=7e904acbe6be';
+import {people,relationships} from '../data.mjs?v=7e904acbe6be';
+
+test('no friendship or Elena–Lila connection reaches any book snapshot',()=>{
+  for(let book=1;book<=4;book++){
+    const s=snapshot(book);
+    assert.ok(s.relationships.every(r=>r.type!=='friendship'));
+    assert.ok(!s.relationships.some(r=>[r.a,r.b].includes('elena')&&[r.a,r.b].includes('lila')));
+  }
+});
+
+test('snapshot rejects accidentally reintroduced platonic data',()=>{
+  const friendship={id:'accidental-friendship',a:'elena',b:'lila',type:'friendship',versions:[{book:1,label:'Friendship',children:[],note:''}]};
+  relationships.push(friendship);
+  try{for(let book=1;book<=4;book++)assert.ok(!snapshot(book).relationships.some(r=>r.id===friendship.id));}
+  finally{relationships.pop();}
+});
 
 test('fresh / invalid progress defaults to Book 1',()=>{for(const v of [undefined,0,5,'garbage',1.5])assert.equal(validBook(v),1);});
 test('all references resolve and event versions are ordered',()=>{
