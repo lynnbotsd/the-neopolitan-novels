@@ -11,7 +11,7 @@ export const families = [
   {id:'scanno',name:'Scanno',trade:'The fruit sellers’ family',parents:['nicola','assunta'],children:['enzo']},
   {id:'peluso',name:'Peluso',trade:'The carpenter’s family',parents:['alfredo','giuseppina'],children:['pasquale','carmen']},
   {id:'solara',name:'Solara',trade:'The bar-pastry shop family',parents:['silvio','manuela'],children:['marcello','michele']},
-  {id:'spagnuolo',name:'Spagnuolo',trade:'The pastry maker’s family',parents:[],children:['gigliola']},
+  {id:'spagnuolo',name:'Spagnuolo',trade:'The pastry maker’s family',parents:['spagnuolo-father','rosa'],children:['gigliola']},
   {id:'airota',name:'Airota',trade:'The academic family',parents:['guido','adele'],children:['pietro','mariarosa'],introduced:2},
   {id:'galiani',name:'Galiani',trade:'The teacher’s family',parents:['profgaliani'],children:['nadia'],introduced:2}
 ];
@@ -25,6 +25,7 @@ export const people = [
   person('nicola','Nicola','Enzo’s father; fruit seller'),person('assunta','Assunta','Enzo’s mother; fruit seller'),person('enzo','Enzo','Son of the fruit sellers'),
   person('alfredo','Alfredo','Carpenter; father of Pasquale and Carmen'),person('giuseppina','Giuseppina','Mother of Pasquale and Carmen'),person('pasquale','Pasquale','Construction worker; Carmen’s brother'),person('carmen','Carmen / Carmela','Pasquale’s sister'),
   person('silvio','Silvio','Father of Marcello and Michele'),person('manuela','Manuela','Mother of Marcello and Michele',1,'',[1,2,3]),person('marcello','Marcello','Michele’s brother'),person('michele','Michele','Marcello’s brother'),person('gigliola','Gigliola','The pastry maker’s daughter'),
+  person('spagnuolo-father','Signor Spagnuolo','Gigliola’s father; pastry maker at the Solaras’ bar'),person('rosa','Rosa','Gigliola’s mother; wife of the pastry maker'),
   person('guido','Guido','Pietro and Mariarosa’s father',2),person('adele','Adele','Pietro and Mariarosa’s mother',2),person('pietro','Pietro','Son of the Airota family',2),person('mariarosa','Mariarosa','Pietro’s sister',2),
   person('profgaliani','Professor Galiani','Elena’s teacher; Nadia’s mother',2),person('nadia','Nadia','Professor Galiani’s daughter',2),
   person('gino','Gino','The pharmacist’s son',1,'The pharmacist’s son',[1,2,3]),person('franco','Franco Mari','Elena’s university acquaintance',2),person('bruno','Bruno Soccavo','Nino’s friend; son of a factory owner',2,'',[2,3]),

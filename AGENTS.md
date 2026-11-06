@@ -26,3 +26,5 @@
 - Stack connection lanes and sidebar entries chronologically by first attraction or involvement, independently of family columns. Do not add visible sequence numbers. Preserve overlapping/uncertain timing labels; later relationship status changes must not reorder the original connection.
 
 - Use the visible category “Sexual assault”, not a combined abuse/assault label. “Sexual relationship” means ongoing involvement; “Sexual encounter” means a discrete incident without an established ongoing relationship. Describe coercion and consent separately in the details.
+
+- Do not show a “Children” generation label. Gigliola’s parents are Signor Spagnuolo (the pastry maker; no invented given name) and Rosa. Do not draw floating ancestry stems for a lone character with no mapped parents.

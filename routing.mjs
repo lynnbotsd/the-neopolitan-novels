@@ -30,7 +30,7 @@ export function routeConnections({positions,relationships,selected,labelFor}){
     });
   }
   const routes=[];
-  const obstacles=[...cards,{x:90,y:233,w:70,h:18}]; // generation heading
+  const obstacles=cards;
   // Keep the horizontal stack entirely below every visible character card.
   const laneYs=Array.from({length:edges.length+1},(_,i)=>bottom+44+i*64);
   for(const r of edges){

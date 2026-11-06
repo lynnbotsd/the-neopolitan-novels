@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=576b40b4c02e';
-import {people,relationships} from '../data.mjs?v=576b40b4c02e';
+import {snapshot,connections,validBook} from '../model.mjs?v=1649c49a4439';
+import {people,relationships} from '../data.mjs?v=1649c49a4439';
 
 test('dating is distinct from affairs and changes with the book',()=>{
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');

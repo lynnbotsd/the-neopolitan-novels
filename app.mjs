@@ -1,6 +1,6 @@
-import {routeConnections,routePath} from './routing.mjs?v=576b40b4c02e';
-import {books,typeLabels} from './data.mjs?v=576b40b4c02e';
-import {snapshot,connections,validBook} from './model.mjs?v=576b40b4c02e';
+import {routeConnections,routePath} from './routing.mjs?v=1649c49a4439';
+import {books,typeLabels} from './data.mjs?v=1649c49a4439';
+import {snapshot,connections,validBook} from './model.mjs?v=1649c49a4439';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -9,7 +9,7 @@ function el(tag,attrs={},text){const node=document.createElementNS(ns,tag);for(c
 function html(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;}
 function person(id){return state.people.find(p=>p.id===id);}
 function familyOf(id){return state.families.find(f=>f.parents.includes(id)||f.children.includes(id));}
-function name(id){const p=person(id),f=familyOf(id);return p.label+(f?' '+f.name:'');}
+function name(id){const p=person(id),f=familyOf(id);return p.label+(f&&!p.label.endsWith(' '+f.name)?' '+f.name:'');}
 
 function buildLayout(){
   const positions=new Map();
@@ -45,14 +45,13 @@ function drawMap(){
     svg.append(el('text',{x:cx,y:71,'text-anchor':'middle',class:'family-trade'},f.trade));
     svg.append(el('line',{x1:cx-83,x2:cx+83,y1:90,y2:90,class:'family-rule'}));
     const childBottom=280+(f.children.length-1)*61;
-    if(f.parents.length){
+    if(f.parents.length&&f.children.length){
       let d=`M${cx} 165 V210 H${cx-83} V${childBottom}`;
       if(f.parents.length===2)d+=` M${cx-51} 164 V185 H${cx+51} V164 M${cx} 185 V210`;
-      lines.append(el('path',{d,class:'family-line'}));
-    }else lines.append(el('path',{d:`M${cx-83} 240 V${childBottom}`,class:'family-line'}));
-    f.children.forEach(id=>{const p=layout.positions.get(id);lines.append(el('path',{d:`M${cx-83} ${p.y} H${p.x-p.w/2}`,class:'family-line'}));});
+      lines.append(el('path',{d,class:'family-line','data-family':f.id}));
+    }else if(f.children.length>1)lines.append(el('path',{d:`M${cx-83} 280 V${childBottom}`,class:'family-line','data-family':f.id}));
+    if(f.parents.length||f.children.length>1)f.children.forEach(id=>{const p=layout.positions.get(id);lines.append(el('path',{d:`M${cx-83} ${p.y} H${p.x-p.w/2}`,class:'family-line'}));});
   });
-  svg.append(el('text',{x:56,y:235,class:'generation-label'},'CHILDREN'));
   if(layout.visibleOutside.length){
     svg.append(el('text',{x:layout.outsideX,y:48,'text-anchor':'middle',class:'family-heading'},'Other characters'));
     svg.append(el('text',{x:layout.outsideX,y:71,'text-anchor':'middle',class:'family-trade'},'Connected to '+person(selected).label));
