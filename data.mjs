@@ -110,4 +110,4 @@ export const relationships = relationshipData.map(r=>{
   const [rank,period]=relationshipBeginnings[r.id];
   return {...r,versions:r.versions.map((version,i)=>i===0?{...version,chronology:{rank,period}}:version)};
 });
-export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',dating:'Dating',affair:'Affair',attraction:'Crush / attraction',relationship:'Sexual relationship',abuse:'Sexual abuse / assault',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};
+export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',dating:'Dating',affair:'Affair',attraction:'Crush / attraction',relationship:'Sexual relationship',abuse:'Sexual assault',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};

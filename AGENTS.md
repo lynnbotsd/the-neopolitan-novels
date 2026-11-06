@@ -24,3 +24,5 @@
 - Preserve the current left-to-right family order. Keep horizontal connection lanes and labels below all visible character cards; vertical stems run beside cards. Use distinct ports and tracks, and keep labels clear of cards and other routes. Map labels show both names on the first line, with the relationship type always on a separate line underneath. Never collapse the type inline or omit it for shorter routes. Complete details and children remain in the sidebar.
 
 - Stack connection lanes and sidebar entries chronologically by first attraction or involvement, independently of family columns. Do not add visible sequence numbers. Preserve overlapping/uncertain timing labels; later relationship status changes must not reorder the original connection.
+
+- Use the visible category “Sexual assault”, not a combined abuse/assault label. “Sexual relationship” means ongoing involvement; “Sexual encounter” means a discrete incident without an established ongoing relationship. Describe coercion and consent separately in the details.
