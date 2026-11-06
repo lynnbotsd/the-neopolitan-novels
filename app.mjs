@@ -1,5 +1,5 @@
-import {books,typeLabels} from './data.mjs?v=7e904acbe6be';
-import {snapshot,connections,validBook} from './model.mjs?v=7e904acbe6be';
+import {books,typeLabels} from './data.mjs?v=216bcf6f76f8';
+import {snapshot,connections,validBook} from './model.mjs?v=216bcf6f76f8';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -23,9 +23,11 @@ function buildLayout(){
   return {width,height:Math.max(1030,920+list.length*70),positions,outside,list};
 }
 function nodeGraphic(p,pos,related){
-  const g=el('g',{class:'person-node'+(pos.parent?' parent':'')+(p.id===selected?' selected':related.has(p.id)?' related':''),role:'button',tabindex:'0','aria-label':name(p.id)+'; show connections','aria-pressed':String(p.id===selected),'data-person':p.id,transform:`translate(${pos.x},${pos.y})`});
+  const g=el('g',{class:'person-node'+(pos.parent?' parent':'')+(p.id===selected?' selected':related.has(p.id)?' related':''),role:'button',tabindex:'0','aria-label':name(p.id)+(p.subtitle?', '+p.subtitle:'')+'; show connections','aria-pressed':String(p.id===selected),'data-person':p.id,transform:`translate(${pos.x},${pos.y})`});
   g.append(el('rect',{x:-pos.w/2,y:-pos.h/2,width:pos.w,height:pos.h}));
-  g.append(el('text',{x:0,y:4},p.label));return g;
+  g.append(el('text',{x:0,y:p.subtitle?-3:4},p.label));
+  if(p.subtitle)g.append(el('text',{x:0,y:13,class:'node-subtitle'},p.subtitle));
+  return g;
 }
 function drawMap(){
   layout=buildLayout();const svg=$('#family-map');svg.replaceChildren();svg.setAttribute('width',layout.width);svg.setAttribute('height',layout.height);svg.setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);
@@ -78,6 +80,7 @@ function drawPanel(){
   list.forEach(r=>{
     const other=r.a===selected?r.b:r.a;const item=html('section','relationship-item');
     const b=html('button','partner-button',name(other));b.type='button';b.dataset.person=other;b.append(html('span','','↗'));item.append(b);
+    if(person(other).subtitle)item.append(html('p','partner-subtitle',person(other).subtitle));
     item.append(html('p','relationship-type',typeLabels[r.type]));item.append(html('p','relationship-status',r.label));
     if(r.children.length){const c=html('p','children');c.append(html('strong','','Children · '));c.append(document.createTextNode(r.children.join(', ')));item.append(c);}
     if(r.note)item.append(html('p','relationship-note',r.note));

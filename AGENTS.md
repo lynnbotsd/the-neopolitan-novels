@@ -13,3 +13,6 @@
 - Run `npm test` after data/model changes and check relevant UI behavior after interface changes.
 - Run `npm run build` before publishing any browser-source changes. This versions the entry script, stylesheet, and every imported module together to prevent mixed cached releases.
 - Do not add tokens, personal information, chat transcripts, or scratch files to this public repository.
+
+- Dating and affairs are distinct categories. Never use a combined “Dating / affair” label. Elena–Gino and the early Elena–Antonio relationship are dating. Category changes belong to book-specific versions.
+- Gino’s map node includes the subtitle “The pharmacist’s son”.

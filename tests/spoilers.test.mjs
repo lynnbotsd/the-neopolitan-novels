@@ -1,7 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=7e904acbe6be';
-import {people,relationships} from '../data.mjs?v=7e904acbe6be';
+import {snapshot,connections,validBook} from '../model.mjs?v=216bcf6f76f8';
+import {people,relationships} from '../data.mjs?v=216bcf6f76f8';
+
+test('dating is distinct from affairs and changes with the book',()=>{
+  for(let book=1;book<=4;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
+  for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-antonio').type,'dating');
+  assert.equal(snapshot(4).relationships.find(r=>r.id==='elena-antonio').type,'encounter');
+  assert.equal(snapshot(1).relationships.find(r=>r.id==='elena-nino').type,'attraction');
+  assert.equal(snapshot(3).relationships.find(r=>r.id==='elena-nino').type,'affair');
+  assert.equal(people.find(p=>p.id==='gino').subtitle,'The pharmacist’s son');
+});
 
 test('no friendship or Elena–Lila connection reaches any book snapshot',()=>{
   for(let book=1;book<=4;book++){
