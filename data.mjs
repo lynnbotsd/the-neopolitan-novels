@@ -69,4 +69,4 @@ export const relationships = [
   {id:'nino-doctor',a:'nino',b:'gynecologist',type:'affair',versions:[v(4,'Affair reported by Antonio')]},
   {id:'pinuccia-bruno',a:'pinuccia',b:'bruno',type:'pursuit',versions:[v(2,'Pinuccia’s attraction on Ischia',[],'Not shown as a consummated affair.')]}
 ];
-export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',dating:'Dating',affair:'Affair',attraction:'Crush / attraction',relationship:'Sexual relationship',abuse:'Sexual abuse / encounter',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};
+export const typeLabels = {marriage:'Marriage / engagement',partnership:'Partnership',dating:'Dating',affair:'Affair',attraction:'Crush / attraction',relationship:'Sexual relationship',abuse:'Sexual abuse / assault',encounter:'Sexual encounter',pursuit:'Pursuit / attraction'};

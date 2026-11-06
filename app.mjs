@@ -1,5 +1,5 @@
-import {books,typeLabels} from './data.mjs?v=fbc2b55f278f';
-import {snapshot,connections,validBook} from './model.mjs?v=fbc2b55f278f';
+import {books,typeLabels} from './data.mjs?v=84ca2571c0e9';
+import {snapshot,connections,validBook} from './model.mjs?v=84ca2571c0e9';
 
 const $=s=>document.querySelector(s);
 const ns='http://www.w3.org/2000/svg';
@@ -78,6 +78,16 @@ function drawMap(){
   $('#map-caption').textContent=`Book ${book} · ${name(selected)}’s connections`;
   resizeMap();
 }
+function drawLegend(){
+  const legend=$('#map-legend');legend.replaceChildren();
+  const entries=[['kin','Family'],...Object.entries(typeLabels).filter(([type])=>state.relationships.some(r=>r.type===type))];
+  entries.forEach(([type,label])=>{
+    const item=html('span','legend-item');item.setAttribute('role','listitem');
+    const swatch=el('svg',{class:'legend-swatch',width:32,height:12,viewBox:'0 0 32 12','aria-hidden':'true'});
+    swatch.append(el('path',{d:'M1 6 H31',class:type==='kin'?'family-line':'connection-line '+type}));
+    item.append(swatch,document.createTextNode(label));legend.append(item);
+  });
+}
 function drawOtherCharacters(){
   const list=$('#other-character-list');list.replaceChildren();
   $('#other-characters').hidden=!layout.outside.length;
@@ -111,7 +121,7 @@ function drawPanel(){
   });
 }
 function resizeMap(){if(!layout)return;$('#family-map').style.transform=`scale(${zoom})`;$('#map-size').style.width=layout.width*zoom+'px';$('#map-size').style.height=layout.height*zoom+'px';$('#zoom-label').textContent=Math.round(zoom*100)+'%';}
-function render(){drawMap();drawOtherCharacters();drawPanel();}
+function render(){drawMap();drawLegend();drawOtherCharacters();drawPanel();}
 function setBook(value){book=validBook(value);state=snapshot(book);if(!person(selected))selected='elena';document.querySelectorAll('[data-book]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.book)===book)));$('#reading-note').textContent=`Characters in Book ${book}; information revealed through its ending.`;render();}
 function selectPerson(id){if(!person(id))return;selected=id;render();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-book]');if(b)setBook(b.dataset.book);const p=e.target.closest('[data-person]');if(p){const fromDirectory=Boolean(p.closest('#other-characters'));selectPerson(p.dataset.person);if(fromDirectory){const pos=layout.positions.get(selected);$('#map-scroll').scrollTo({left:Math.max(0,pos.x*zoom-$('#map-scroll').clientWidth/2),top:Math.max(0,pos.y*zoom-130)});$('#other-character-list').querySelector(`[data-person="${selected}"]`)?.focus({preventScroll:true});}}});
