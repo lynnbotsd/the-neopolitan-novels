@@ -18,3 +18,5 @@
 - Gino’s map node includes the subtitle “The pharmacist’s son”.
 
 - Keep the Other characters directory outside the map canvas, above it. Only selected/connected characters without a family column appear in the map, in a dedicated rightmost column; never put an unrelated row through connection routes.
+
+- Relationship category labels describe relationships occurring anywhere during the selected book. Use “Past” only when the relationship occurs solely in earlier books; a breakup within the selected book does not make that whole book’s category “Past”.

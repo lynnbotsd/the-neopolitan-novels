@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {snapshot,connections,validBook} from '../model.mjs?v=d3e61560dcf7';
-import {people,relationships} from '../data.mjs?v=d3e61560dcf7';
+import {snapshot,connections,validBook} from '../model.mjs?v=2256ebbe5337';
+import {people,relationships} from '../data.mjs?v=2256ebbe5337';
 
 test('dating is distinct from affairs and changes with the book',()=>{
   for(let book=1;book<=3;book++)assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').type,'dating');
@@ -64,7 +64,8 @@ test('book-specific characters and their edges do not carry into later books',()
     assert.ok(!snapshot(4).relationships.some(r=>r.a===id||r.b===id));
     assert.ok(snapshot(4).families.every(f=>!f.parents.includes(id)&&!f.children.includes(id)));
   }
-  assert.equal(snapshot(1).relationships.find(r=>r.id==='elena-gino').past,true);
+  assert.ok(!snapshot(1).relationships.find(r=>r.id==='elena-gino').past);
+  for(const book of [2,3])assert.equal(snapshot(book).relationships.find(r=>r.id==='elena-gino').past,true);
   assert.equal(snapshot(3).relationships.find(r=>r.id==='elena-gino').label,'Former boyfriend');
   assert.ok(snapshot(1).people.some(p=>p.id==='gino'));
 });
